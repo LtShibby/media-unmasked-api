@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, HttpUrl
 from typing import Dict, Any, List
 import logging
+import os
+from supabase import create_client
 
 from mediaunmasked.scrapers.article_scraper import ArticleScraper
 from mediaunmasked.analyzers.scoring import MediaScorer
@@ -15,6 +17,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["analysis"])
 scraper = ArticleScraper()
 scorer = MediaScorer()
+
+# Initialize Supabase connection
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 class ArticleRequest(BaseModel):
     url: HttpUrl
@@ -57,6 +64,15 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
     try:
         logger.info(f"Analyzing article: {request.url}")
         
+        # Check if the article has already been analyzed
+        existing_article = supabase.table('article_analysis').select('*').eq('url', str(request.url)).execute()
+        
+        if existing_article.status_code == 200 and existing_article.data:
+            logger.info("Article already analyzed. Returning cached data.")
+            # Return the existing analysis result if it exists
+            cached_data = existing_article.data[0]
+            return AnalysisResponse.parse_obj(cached_data)
+        
         # Scrape article
         article = scraper.scrape_article(str(request.url))
         if not article:
@@ -76,7 +92,7 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
         logger.info(f"media_unmasked_score type: {type(analysis['media_unmasked_score'])}")
         logger.info(f"media_unmasked_score value: {analysis['media_unmasked_score']}")
         
-        # Ensure correct types in response
+        # Prepare response data
         response_dict = {
             "headline": str(article['headline']),
             "content": str(article['content']),
@@ -110,10 +126,20 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
             }
         }
         
-        # Log the final structure
-        logger.info("Final response structure:")
-        logger.info(response_dict)
+        # Save the new analysis to Supabase
+        supabase.table('article_analysis').upsert({
+            'url': str(request.url),
+            'headline': response_dict['headline'],
+            'content': response_dict['content'],
+            'sentiment': response_dict['sentiment'],
+            'bias': response_dict['bias'],
+            'bias_score': response_dict['bias_score'],
+            'bias_percentage': response_dict['bias_percentage'],
+            'flagged_phrases': response_dict['flagged_phrases'],
+            'media_score': response_dict['media_score']
+        }).execute()
         
+        # Return the response
         return AnalysisResponse.parse_obj(response_dict)
         
     except Exception as e:
@@ -157,4 +183,4 @@ async def debug_response():
             }
         }
     }
-    return AnalysisResponse.parse_obj(mock_analysis) 
+    return AnalysisResponse.parse_obj(mock_analysis)
