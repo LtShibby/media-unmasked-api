@@ -11,6 +11,5 @@ torch==2.1.2
 numpy==1.26.3
 pytest==7.4.3
 pytest-asyncio==0.21.1
-httpx==0.25.2  # Ensure you're using the version you need, or consider downgrading if needed
-supabase-py  # Keep it without a version constraint, or pin to a working version like 1.0.0
+httpx==0.25.2
 configparser>=6.0.0
