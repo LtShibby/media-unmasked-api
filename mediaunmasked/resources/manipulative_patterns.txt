@@ -1,0 +1,178 @@
+# 📂 resources/manipulative_patterns.txt
+# -------------------------------------------------
+# 🔹 Vague Attribution (Unverifiable Sources)
+experts fear
+some say
+many believe
+it's clear that
+obviously
+everyone knows
+sources say
+people are saying
+research suggests
+critics argue
+analysts warn
+reportedly
+insiders claim
+industry experts agree
+whispers in the industry
+a growing number of people think
+sources close to the matter indicate
+reports suggest
+insiders reveal
+unnamed sources confirm
+widely believed
+it has been said
+word on the street is
+
+# 🔹 Exaggeration & Absolutist Language
+\b(all|none|every|always|never)\b
+without question
+undeniably
+beyond a doubt
+without a shadow of a doubt
+irrefutable proof
+inarguable
+scientifically proven
+guaranteed
+no one can deny
+absolutely certain
+inevitable collapse
+completely unprecedented
+no alternative but
+totally discredited
+this changes everything
+nothing can stop
+without fail
+history shows that
+
+# 🔹 Emotional Manipulation & Loaded Language
+the shocking truth
+horrifying evidence
+dangerously misguided
+deeply disturbing
+alarming new trend
+terrifying reality
+outrageous attack
+crippling consequences
+heartbreaking truth
+a devastating blow
+frightening new report
+explosive details
+disturbing allegations
+corrupt elites
+facing total destruction
+hidden agenda
+deliberate deception
+reckless policies
+radical takeover
+secret plot exposed
+exposed corruption
+will destroy everything
+brainwashing the masses
+a brutal betrayal
+shocking revelations
+an unthinkable scenario
+must be stopped at all costs
+selling out the people
+
+# 🔹 False Balance & False Equivalencies
+both sides are equally to blame
+to be fair, some argue
+some would say it's just as bad as
+on one hand, but on the other hand
+many claim there’s no difference
+equally problematic on both sides
+critics claim, but supporters argue
+it’s just like (unrelated issue)
+just as bad as
+making the same mistakes
+exactly like
+history repeating itself
+
+# 🔹 Implying Authority Without Evidence
+leading experts agree
+a well-known figure once said
+the science is settled
+unquestionable truth
+indisputable fact
+respected authorities confirm
+established research shows
+a Nobel Prize-winning scientist believes
+the most intelligent minds agree
+top thinkers of our time argue
+those who disagree are uninformed
+no real expert would dispute this
+a professor from a top university claims
+all credible scientists believe
+no serious researcher disagrees
+
+# 🔹 Implying Popular Consensus Without Data
+the majority of people think
+society agrees that
+most intelligent people understand
+an overwhelming number of people
+the vast majority
+widely considered to be true
+popular opinion suggests
+everyone is talking about
+most believe
+
+# 🔹 Framing Opponents in a Negative Light
+only extremists believe otherwise
+people who disagree are in denial
+anyone who questions this is ignorant
+blindly following the agenda
+out of touch with reality
+desperate attempt to save face
+trying to cover up the truth
+a last-ditch effort to deceive
+refusing to accept facts
+spreading misinformation
+manipulated by special interests
+driven by greed and corruption
+being paid to say otherwise
+deliberately misleading
+hiding the truth from the public
+working against the people
+exploiting the system
+part of the problem, not the solution
+dangerous and reckless
+acting in bad faith
+
+# 🔹 Implying Urgency & Fear-Mongering
+we are running out of time
+before it’s too late
+act now before disaster strikes
+imminent collapse
+crisis is unfolding
+ticking time bomb
+on the brink of disaster
+looming catastrophe
+a dire warning
+facing an existential threat
+the fate of our nation
+before it's too late
+can’t afford to wait
+if this continues, we’re doomed
+the last chance to save
+history will not be kind
+future generations will suffer
+too dangerous to ignore
+
+# 🔹 Appealing to Nostalgia & Past Glory
+things were better before
+back in the good old days
+when America was great
+returning to our roots
+the way it was meant to be
+before things got out of hand
+we’ve lost our way
+we need to go back to simpler times
+what our forefathers intended
+traditional values are under attack
+restoring the glory days
+reclaiming what was lost
+remember when things made sense?
+back when people had morals
+the downfall of our civilization

@@ -1,0 +1,233 @@
+# 📂 resources/right_bias_words.txt
+# -------------------------------------------------
+# 🔹 Political Ideology & Economic Policy
+right-wing
+liberal
+traditional values
+free market
+capitalism
+small government
+big government overreach
+limited government
+fiscal responsibility
+trickle-down economics
+deregulation
+job creators
+personal responsibility
+welfare dependency
+individual liberty
+government waste
+tax cuts
+pro-business policies
+pro-growth policies
+big government socialism
+crony capitalism
+hard work pays off
+socialist policies fail
+self-reliance
+national sovereignty
+
+# 🔹 Climate & Environmental Policy
+climate alarmism
+climate hoax
+green energy scam
+drill baby drill
+energy independence
+clean coal
+pro-fracking
+stop the war on oil
+anti-carbon tax
+regulatory overreach
+climate hysteria
+fossil fuel industry
+radical environmentalists
+alternative energy myths
+global warming exaggeration
+renewable energy failure
+climate change agenda
+big government green policies
+end subsidies for green energy
+eco-terrorism
+emissions regulations kill jobs
+climate change skepticism
+scientific consensus is flawed
+
+# 🔹 Social Issues & Culture Wars
+woke agenda
+cancel culture
+critical race theory
+identity politics
+anti-woke
+war on Christmas
+traditional marriage
+family values
+religious freedom
+biblical principles
+faith-based values
+cultural marxism
+gender ideology
+biological reality
+trans agenda
+protect women’s sports
+Christian persecution
+church over state
+anti-religious bigotry
+parental rights
+indoctrination in schools
+reverse racism
+meritocracy matters
+law and order
+war on masculinity
+anti-gun propaganda
+
+# 🔹 Immigration & Border Policy
+illegal aliens
+border crisis
+invasion at the border
+build the wall
+secure our borders
+deportation
+amnesty is a scam
+open borders policy
+sanctuary cities are unsafe
+migrant caravans
+protect American workers
+chain migration
+anchor babies
+English as the official language
+vetting immigrants
+catch and deport
+mass migration problem
+border security first
+illegals taking American jobs
+criminal aliens
+no asylum abuse
+end birthright citizenship
+border patrol under attack
+
+# 🔹 Healthcare & Public Welfare
+government takeover of healthcare
+socialized medicine fails
+free healthcare is a myth
+Medicare for all is unsustainable
+private insurance rights
+Obamacare disaster
+healthcare freedom
+personal responsibility in healthcare
+rationed care
+universal healthcare means higher taxes
+health savings accounts
+big pharma collusion
+big government healthcare
+death panels
+nanny state policies
+taxpayer-funded abortion
+personalized medicine
+free market healthcare solutions
+government interference in medicine
+healthcare choice
+welfare abuse
+entitlement reform
+personalized care models
+stop welfare expansion
+
+# 🔹 Gun Rights & Public Safety
+gun control doesn’t work
+Second Amendment rights
+constitutional carry
+good guy with a gun
+gun grabbers
+assault weapons myth
+defend the Second Amendment
+law-abiding gun owners
+red flag laws violate rights
+shall not be infringed
+gun-free zones don't work
+arming teachers
+NRA-backed legislation
+stand your ground
+self-defense rights
+gun rights under attack
+criminals ignore gun laws
+leftists want total disarmament
+defund the police is dangerous
+crime wave
+law and order policies
+Democrats are soft on crime
+
+# 🔹 Media & Big Tech Censorship
+mainstream media lies
+fake news media
+media bias
+left-wing media monopoly
+corporate media corruption
+conservative voices silenced
+shadow banning
+Big Tech censorship
+social media suppression
+fact-checkers are biased
+alternative media
+legacy media collapse
+biased journalism
+freedom of speech under attack
+media elite
+disinformation police
+Silicon Valley leftist agenda
+misinformation double standard
+conservative accounts banned
+election interference
+algorithm manipulation
+digital free speech
+
+# 🔹 Election Integrity & Government Accountability
+election fraud
+stolen election
+mail-in ballot fraud
+ballot harvesting
+illegal voting
+rigged elections
+secure the vote
+voter ID laws
+dead people voting
+stop election interference
+clean voter rolls
+fair elections
+stop the steal
+Democrat-run cities are corrupt
+big government tyranny
+congressional overreach
+political witch hunt
+government accountability
+unelected bureaucrats
+administrative state abuse
+taxpayer money wasted
+drain the swamp
+deep state
+two-tiered justice system
+weaponization of government
+
+# 🔹 Foreign Policy & National Defense
+America First
+patriotic nationalism
+globalism is a threat
+weak foreign policy
+military strength
+peace through strength
+support our troops
+anti-interventionism
+funding our enemies
+China threat
+Russia hoax
+leftist appeasement
+national security first
+endless wars are a mistake
+pro-Israel stance
+secure our allies
+foreign aid waste
+Biden’s weak leadership
+defund the UN
+globalist elites
+pro-American trade policies
+stop outsourcing jobs
+stop military woke policies
+secure American sovereignty

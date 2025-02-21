@@ -1,0 +1,187 @@
+# 📂 resources/left_bias_words.txt
+# -------------------------------------------------
+# 🔹 Political Ideology & Economic Policy
+progressive
+conservative
+socialist
+democratic socialism
+democratic socialist
+far-right
+equity
+justice for all
+wealth redistribution
+universal basic income
+living wage
+income inequality
+wealth inequality
+fair trade
+social safety net
+corporate greed
+workers' rights
+unionize
+collective bargaining
+minimum wage increase
+universal childcare
+tax the rich
+economic justice
+capitalism is broken
+billionaires shouldn't exist
+
+# 🔹 Climate & Environmental Policy
+climate crisis
+climate emergency
+sustainability
+green energy
+carbon footprint
+fossil fuel divestment
+environmental justice
+net zero
+renewable energy
+solar energy
+climate action
+big oil
+carbon tax
+Green New Deal
+climate deniers
+eco-friendly policies
+clean energy revolution
+plastic ban
+end fracking
+divest from coal
+extreme weather is worsening
+global warming is real
+environmental responsibility
+wildlife protection
+eco-activism
+
+# 🔹 Social Justice & Identity Politics
+social justice
+racial justice
+systemic racism
+white privilege
+microaggressions
+BIPOC
+LGBTQ+ rights
+gender pay gap
+affirmative action
+decolonization
+indigenous sovereignty
+equity vs equality
+patriarchy
+gender-inclusive
+intersectionality
+trans rights
+feminism
+gender-affirming care
+abolish ICE
+police brutality
+defund the police
+prison abolition
+restorative justice
+white supremacy
+hate speech laws
+critical race theory
+diversity, equity, inclusion
+reproductive justice
+women's bodily autonomy
+reparations
+
+# 🔹 Healthcare & Public Welfare
+Medicare for All
+universal healthcare
+public option
+free healthcare
+single-payer system
+affordable healthcare
+healthcare is a human right
+insulin price cap
+Big Pharma
+mental health parity
+food insecurity
+public housing
+student loan forgiveness
+affordable education
+debt relief
+expand social security
+disability rights
+homeless crisis
+opioid epidemic response
+guaranteed paid leave
+maternal mortality crisis
+expand Medicaid
+community healthcare clinics
+healthcare access for all
+pre-existing conditions coverage
+
+# 🔹 Gun Control & Public Safety
+gun violence prevention
+common-sense gun laws
+background checks
+gun reform
+assault weapons ban
+mass shootings epidemic
+red flag laws
+gun buyback programs
+ban high-capacity magazines
+NRA influence
+public safety over profit
+gun safety legislation
+school shootings crisis
+responsible gun ownership
+fewer guns, safer communities
+demilitarize the police
+ban ghost guns
+universal gun laws
+ban open carry
+reduce firearm access
+mandatory firearm registration
+
+# 🔹 Immigration & Border Policy
+path to citizenship
+DACA
+dreamers
+migrant rights
+asylum seekers
+refugee protection
+abolish ICE
+border security is racist
+family separation
+sanctuary cities
+humanitarian crisis at the border
+comprehensive immigration reform
+no human is illegal
+end child detention
+protect immigrants
+immigrants strengthen the economy
+undocumented workers deserve rights
+border wall waste
+decriminalize border crossings
+reunite families
+amnesty for undocumented
+
+# 🔹 Media & Information Bias
+misinformation crisis
+fact-based reporting
+right-wing disinformation
+alternative facts
+Fox News propaganda
+media literacy
+fight misinformation
+Big Tech accountability
+social media regulation
+disinformation campaigns
+protect press freedom
+independent journalism
+mainstream media bias
+fact-checking matters
+ban fake news
+Russian interference
+algorithmic bias
+political misinformation
+fair and accurate reporting
+truth matters
+anti-science rhetoric
+climate denial media
+ban extremist media
+right-wing conspiracy theories
+protecting democracy
