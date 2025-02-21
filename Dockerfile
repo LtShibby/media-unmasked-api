@@ -7,9 +7,13 @@ WORKDIR /app
 # Create a writable cache directory for Hugging Face
 RUN mkdir -p /app/.cache/huggingface/hub && chmod -R 777 /app/.cache
 
+# Install supabase-py directly from GitHub
+RUN pip install --upgrade pip
+RUN pip install git+https://github.com/supabase/supabase-py.git
+
 # Copy dependencies
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all files
 COPY . .
