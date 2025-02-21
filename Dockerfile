@@ -10,9 +10,8 @@ RUN apt-get update && apt-get install -y git
 # Create a writable cache directory for Hugging Face
 RUN mkdir -p /app/.cache/huggingface/hub && chmod -R 777 /app/.cache
 
-# Install supabase-py directly from GitHub
+# Upgrade pip
 RUN pip install --upgrade pip
-RUN pip install git+https://github.com/supabase/supabase-py.git
 
 # Copy dependencies
 COPY requirements.txt .
