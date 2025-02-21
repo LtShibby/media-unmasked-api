@@ -9,7 +9,7 @@ RUN mkdir -p /app/.cache/huggingface/hub && chmod -R 777 /app/.cache
 
 # Copy dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Copy all files
 COPY . .

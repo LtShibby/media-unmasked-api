@@ -70,8 +70,8 @@ async def analyze_content(request: AnalyzeRequest):
         return AnalyzeResponse.parse_obj(response_dict)
 
     except Exception as e:
-        logger.error(f"Analysis failed: {str(e)}", exc_info=True)
+        logger.error(f"Analysis failed inside of analyze.py: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"Analysis failed: {str(e)}"
+            detail=f"Analysis failed inside of analyze.py: {str(e)}"
         )
