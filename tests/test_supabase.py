@@ -1,5 +1,5 @@
 import configparser
-from supabase import create_client
+from supabase import create_client, AsyncClient
 
 # Read the properties file
 config = configparser.ConfigParser()
@@ -10,7 +10,7 @@ SUPABASE_URL = config.get('DEFAULT', 'SUPABASE_URL')
 SUPABASE_KEY = config.get('DEFAULT', 'SUPABASE_KEY')
 
 # Initialize Supabase client
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = AsyncClient(SUPABASE_URL, SUPABASE_KEY)
 
 # Test data to insert and update
 test_url = "https://www.straitstimes.com/world/united-states/us-senate-confirms-trump-loyalist-kash-patel-to-head-fbi"

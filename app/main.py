@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from supabase import create_client
+from supabase import create_client, AsyncClient
 from app.routers import analyze, health
 
 # FastAPI app setup
@@ -21,7 +21,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 if SUPABASE_URL and SUPABASE_KEY:
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    supabase = AsyncClient(SUPABASE_URL, SUPABASE_KEY)
     print("Connected to Supabase successfully!")
 else:
     print("Supabase connection failed. Please check your secrets.")

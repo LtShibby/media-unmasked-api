@@ -3,7 +3,7 @@ from pydantic import BaseModel, HttpUrl
 from typing import Dict, Any, List
 import logging
 import os
-from supabase import create_client
+from supabase import create_client, AsyncClient
 
 from mediaunmasked.scrapers.article_scraper import ArticleScraper
 from mediaunmasked.analyzers.scoring import MediaScorer
@@ -21,7 +21,7 @@ scorer = MediaScorer()
 # Initialize Supabase connection (works for async environments)
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)  # This works for async
+supabase = AsyncClient(SUPABASE_URL, SUPABASE_KEY)  # This works for async
 
 class ArticleRequest(BaseModel):
     url: HttpUrl
