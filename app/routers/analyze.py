@@ -3,7 +3,7 @@ from mediaunmasked.schemas.requests import AnalyzeRequest
 from mediaunmasked.schemas.responses import AnalyzeResponse
 from mediaunmasked.services.analyzer_service import AnalyzerService
 from mediaunmasked.scrapers.article_scraper import ArticleScraper # Assuming you have a scraper module
-from mediaunmasked.analyzers import scoring  # Assuming you have a scorer module
+from mediaunmasked.analyzers.scoring import MediaScorer  # Assuming you have a scorer module
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["analysis"])
 
 scraper = ArticleScraper()
+scorer = MediaScorer()
 
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_content(request: AnalyzeRequest):
@@ -24,7 +25,7 @@ async def analyze_content(request: AnalyzeRequest):
             )
 
         # Perform the analysis (like your old code)
-        analysis = scoring.calculate_media_score(
+        analysis = scorer.calculate_media_score(
             article["headline"],
             article["content"]
         )
