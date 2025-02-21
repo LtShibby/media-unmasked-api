@@ -22,10 +22,12 @@ class AnalyzerService:
         Analyze an article for bias, sentiment, and credibility.
         """
         try:
-            logger.info(f"Analyzing article: {request.url}")
+            # Convert URL to string explicitly
+            url_str = str(request.url)
+            logger.info(f"Analyzing article: {url_str}")
             
             # Scrape article (now synchronous)
-            article = scraper.scrape_article(request.get_url_str())
+            article = scraper.scrape_article(url_str)
             if not article:
                 raise HTTPException(
                     status_code=400,
