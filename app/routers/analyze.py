@@ -1,36 +1,97 @@
-from fastapi import APIRouter, HTTPException
-from mediaunmasked.schemas.requests import AnalyzeRequest
-from mediaunmasked.schemas.responses import AnalyzeResponse
-from mediaunmasked.services.analyzer_service import AnalyzerService
-from mediaunmasked.scrapers.article_scraper import ArticleScraper # Assuming you have a scraper module
-from mediaunmasked.analyzers.scoring import MediaScorer  # Assuming you have a scorer module
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, HttpUrl, Field
+from typing import Dict, Any, List
 import logging
+import sys
+import os
 
+# Add src to Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+from mediaunmasked.scrapers.article_scraper import ArticleScraper
+from mediaunmasked.analyzers.scoring import MediaScorer
+from mediaunmasked.utils.logging_config import setup_logging
+
+# Initialize logging
+setup_logging()
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["analysis"])
-
+# Initialize FastAPI with dependencies
+app = FastAPI()
 scraper = ArticleScraper()
 scorer = MediaScorer()
 
-@router.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_content(request: AnalyzeRequest):
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class ArticleRequest(BaseModel):
+    url: HttpUrl
+
+class MediaScoreDetails(BaseModel):
+    headline_analysis: Dict[str, Any]
+    sentiment_analysis: Dict[str, Any]
+    bias_analysis: Dict[str, Any]
+    evidence_analysis: Dict[str, Any]
+
+class MediaScore(BaseModel):
+    media_unmasked_score: float
+    rating: str
+    details: MediaScoreDetails
+
+class AnalysisResponse(BaseModel):
+    headline: str
+    content: str
+    sentiment: str
+    bias: str
+    bias_score: float
+    bias_percentage: float
+    flagged_phrases: List[str]
+    media_score: MediaScore
+
+@app.post("/analyze", response_model=AnalysisResponse)
+async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
+    """
+    Analyze an article for bias, sentiment, and credibility.
+    
+    Args:
+        request: ArticleRequest containing the URL to analyze
+        
+    Returns:
+        AnalysisResponse with complete analysis results
+        
+    Raises:
+        HTTPException: If scraping or analysis fails
+    """
     try:
-        # Scrape the article content from the provided URL
-        article = scraper.scrape_article(request.url)
+        logger.info(f"Analyzing article: {request.url}")
+        
+        # Scrape article
+        article = scraper.scrape_article(str(request.url))
         if not article:
             raise HTTPException(
                 status_code=400,
                 detail="Failed to scrape article content"
             )
-
-        # Perform the analysis (like your old code)
+        
+        # Analyze content
         analysis = scorer.calculate_media_score(
             article["headline"],
             article["content"]
         )
-
-        # Construct the response
+        
+        # Log raw values for debugging
+        logger.info("Raw values:")
+        logger.info(f"media_unmasked_score type: {type(analysis['media_unmasked_score'])}")
+        logger.info(f"media_unmasked_score value: {analysis['media_unmasked_score']}")
+        
+        # Ensure correct types in response
         response_dict = {
             "headline": str(article['headline']),
             "content": str(article['content']),
@@ -63,15 +124,52 @@ async def analyze_content(request: AnalyzeRequest):
                 }
             }
         }
-
+        
+        # Log the final structure
         logger.info("Final response structure:")
         logger.info(response_dict)
-
-        return AnalyzeResponse.parse_obj(response_dict)
-
+        
+        return AnalysisResponse.parse_obj(response_dict)
+        
     except Exception as e:
-        logger.error(f"Analysis failed inside of analyze.py: {str(e)}", exc_info=True)
+        logger.error(f"Analysis failed: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"Analysis failed inside of analyze.py: {str(e)}"
+            detail=f"Analysis failed: {str(e)}"
         )
+
+@app.get("/api/debug")
+async def debug_response():
+    mock_analysis = {
+        "headline": "Test Headline",
+        "content": "Test content",
+        "sentiment": "Neutral",
+        "bias": "Neutral",
+        "bias_score": 0.75,  # Note: 0-1 scale
+        "bias_percentage": 0,
+        "flagged_phrases": ["test phrase"],
+        "media_score": {
+            "media_unmasked_score": 75.5,
+            "rating": "Some Bias Present",
+            "details": {
+                "headline_analysis": {
+                    "headline_vs_content_score": 20,
+                    "contradictory_phrases": ["Sample contradiction"]
+                },
+                "sentiment_analysis": {
+                    "sentiment": "Neutral",
+                    "manipulation_score": 30,
+                    "flagged_phrases": ["Sample manipulative phrase"]
+                },
+                "bias_analysis": {
+                    "bias": "Neutral",
+                    "bias_score": 0.75,
+                    "bias_percentage": 0
+                },
+                "evidence_analysis": {
+                    "evidence_based_score": 80
+                }
+            }
+        }
+    }
+    return AnalysisResponse.parse_obj(mock_analysis) 
