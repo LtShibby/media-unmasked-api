@@ -67,7 +67,7 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
         # Check if the article has already been analyzed
         existing_article = await supabase.table('article_analysis').select('*').eq('url', str(request.url)).execute()
         
-        if existing_article.status_code == 200 and existing_article.data:
+        if existing_article.data and len(existing_article.data) > 0:
             logger.info("Article already analyzed. Returning cached data.")
             # Return the existing analysis result if it exists
             cached_data = existing_article.data[0]
