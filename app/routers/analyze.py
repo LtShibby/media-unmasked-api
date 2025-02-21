@@ -1,13 +1,7 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, HttpUrl, Field
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, HttpUrl
 from typing import Dict, Any, List
 import logging
-import sys
-import os
-
-# Add src to Python path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from mediaunmasked.scrapers.article_scraper import ArticleScraper
 from mediaunmasked.analyzers.scoring import MediaScorer
@@ -17,19 +11,10 @@ from mediaunmasked.utils.logging_config import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI with dependencies
-app = FastAPI()
+# Initialize router and dependencies
+router = APIRouter(tags=["analysis"])
 scraper = ArticleScraper()
 scorer = MediaScorer()
-
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 class ArticleRequest(BaseModel):
     url: HttpUrl
@@ -55,7 +40,7 @@ class AnalysisResponse(BaseModel):
     flagged_phrases: List[str]
     media_score: MediaScore
 
-@app.post("/analyze", response_model=AnalysisResponse)
+@router.post("/analyze", response_model=AnalysisResponse)
 async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
     """
     Analyze an article for bias, sentiment, and credibility.
@@ -138,7 +123,7 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
             detail=f"Analysis failed: {str(e)}"
         )
 
-@app.get("/api/debug")
+@router.get("/debug")
 async def debug_response():
     mock_analysis = {
         "headline": "Test Headline",
