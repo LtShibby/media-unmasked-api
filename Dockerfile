@@ -4,6 +4,9 @@ FROM python:3.10-slim
 # Set working directory inside container
 WORKDIR /app
 
+# Create a writable cache directory for Hugging Face
+RUN mkdir -p /app/.cache/huggingface/hub && chmod -R 777 /app/.cache
+
 # Copy dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -13,6 +16,9 @@ COPY . .
 
 # Set PYTHONPATH (simplified)
 ENV PYTHONPATH=/app
+
+# Set the Hugging Face transformers cache directory
+ENV TRANSFORMERS_CACHE=/app/.cache/huggingface/hub
 
 # Expose FastAPI's default port
 EXPOSE 7860

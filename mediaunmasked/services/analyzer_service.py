@@ -24,8 +24,8 @@ class AnalyzerService:
         try:
             logger.info(f"Analyzing article: {request.url}")
             
-            # Scrape article
-            article = await scraper.scrape_article(request.get_url_str())
+            # Scrape article (now synchronous)
+            article = scraper.scrape_article(request.get_url_str())
             if not article:
                 raise HTTPException(
                     status_code=400,
