@@ -11,6 +11,6 @@ torch==2.1.2
 numpy==1.26.3
 pytest==7.4.3
 pytest-asyncio==0.21.1
-httpx==0.25.2
+httpx==0.26.0
 supabase==2.13.0
 configparser>=6.0.0
