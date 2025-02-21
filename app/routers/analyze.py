@@ -18,10 +18,10 @@ router = APIRouter(tags=["analysis"])
 scraper = ArticleScraper()
 scorer = MediaScorer()
 
-# Initialize Supabase connection
+# Initialize Supabase connection (works for async environments)
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)  # This works for async
 
 class ArticleRequest(BaseModel):
     url: HttpUrl
@@ -65,7 +65,7 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
         logger.info(f"Analyzing article: {request.url}")
         
         # Check if the article has already been analyzed
-        existing_article = supabase.table('article_analysis').select('*').eq('url', str(request.url)).execute()
+        existing_article = await supabase.table('article_analysis').select('*').eq('url', str(request.url)).execute()
         
         if existing_article.status_code == 200 and existing_article.data:
             logger.info("Article already analyzed. Returning cached data.")
@@ -127,7 +127,7 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
         }
         
         # Save the new analysis to Supabase
-        supabase.table('article_analysis').upsert({
+        await supabase.table('article_analysis').upsert({
             'url': str(request.url),
             'headline': response_dict['headline'],
             'content': response_dict['content'],
