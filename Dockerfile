@@ -4,6 +4,9 @@ FROM python:3.10-slim
 # Set working directory inside container
 WORKDIR /app
 
+# Install git (required to install from GitHub)
+RUN apt-get update && apt-get install -y git
+
 # Create a writable cache directory for Hugging Face
 RUN mkdir -p /app/.cache/huggingface/hub && chmod -R 777 /app/.cache
 
