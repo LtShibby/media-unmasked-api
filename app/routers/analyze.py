@@ -3,11 +3,15 @@ from pydantic import BaseModel, HttpUrl
 from typing import Dict, Any, List
 import logging
 import os
-from supabase import create_client, AsyncClient
+from supabase import AsyncClient
+from dotenv import load_dotenv
 
 from mediaunmasked.scrapers.article_scraper import ArticleScraper
 from mediaunmasked.analyzers.scoring import MediaScorer
 from mediaunmasked.utils.logging_config import setup_logging
+
+# Load environment variables
+load_dotenv()
 
 # Initialize logging
 setup_logging()
@@ -18,10 +22,15 @@ router = APIRouter(tags=["analysis"])
 scraper = ArticleScraper()
 scorer = MediaScorer()
 
-# Initialize Supabase connection (works for async environments)
+# Get Supabase credentials
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase = AsyncClient(SUPABASE_URL, SUPABASE_KEY)  # This works for async
+
+# Initialize Supabase client
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise Exception("Supabase credentials not found in environment variables")
+
+supabase = AsyncClient(SUPABASE_URL, SUPABASE_KEY)
 
 class ArticleRequest(BaseModel):
     url: HttpUrl
