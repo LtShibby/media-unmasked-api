@@ -1,8 +1,5 @@
 {
   "dependencies": {
-    "supabase": "^2.12.1",
-    "@mui/material": "^5.14.0",
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5"
+    "supabase": "^2.12.1"
   }
 }
