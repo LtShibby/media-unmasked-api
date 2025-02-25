@@ -70,4 +70,8 @@ This project is licensed under the Apache-2.0 License.
 
 ## Contact
 
-For any questions or inquiries, please contact the maintainers at [your-email@example.com].
+For any questions or inquiries, please [contact the maintainers](https://wozwize.com/contact).
+
+## About
+
+MediaUnmasked is a product of [Wozwize](https://wozwize.com), dedicated to providing insightful analysis of media content.
