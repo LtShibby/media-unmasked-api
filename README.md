@@ -1,3 +1,14 @@
+---
+title: Media Unmasked API
+emoji: 👀
+colorFrom: purple
+colorTo: red
+sdk: docker
+pinned: false
+license: apache-2.0
+short_description: AI-powered media bias detection API
+---
+
 # Media Unmasked API
 
 ## Project Overview
