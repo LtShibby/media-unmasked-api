@@ -26,5 +26,4 @@ class AnalysisResponse(BaseModel):
     bias: str
     bias_score: float
     bias_percentage: float
-    flagged_phrases: List[str]
     media_score: MediaScore
