@@ -75,10 +75,25 @@ class MediaScorer:
                 "media_unmasked_score": round(final_score, 1),
                 "rating": rating,
                 "details": {
-                    "headline_analysis": headline_analysis,
-                    "sentiment_analysis": sentiment_analysis,
-                    "bias_analysis": bias_analysis,
-                    "evidence_analysis": evidence_analysis
+                    "headline_analysis": {
+                        "headline_vs_content_score": headline_analysis["headline_vs_content_score"],
+                        "flagged_phrases": headline_analysis.get("flagged_phrases", [])
+                    },
+                    "sentiment_analysis": {
+                        "sentiment": sentiment_analysis["sentiment"],
+                        "manipulation_score": sentiment_analysis["manipulation_score"],
+                        "flagged_phrases": sentiment_analysis.get("flagged_phrases", [])
+                    },
+                    "bias_analysis": {
+                        "bias": bias_analysis["bias"],
+                        "bias_score": bias_analysis["bias_score"],
+                        "bias_percentage": bias_analysis["bias_percentage"],
+                        "flagged_phrases": bias_analysis.get("flagged_phrases", [])
+                    },
+                    "evidence_analysis": {
+                        "evidence_based_score": evidence_analysis["evidence_based_score"],
+                        "flagged_phrases": evidence_analysis.get("flagged_phrases", [])
+                    }
                 }
             }
             
@@ -93,9 +108,9 @@ class MediaScorer:
                 "media_unmasked_score": 0,
                 "rating": "Error",
                 "details": {
-                    "headline_analysis": {"headline_vs_content_score": 0, "contradictory_phrases": []},
+                    "headline_analysis": {"headline_vs_content_score": 0, "flagged_phrases": []},
                     "sentiment_analysis": {"sentiment": "Error", "manipulation_score": 0, "flagged_phrases": []},
-                    "bias_analysis": {"bias": "Error", "bias_score": 0.0, "bias_percentage": 0},
-                    "evidence_analysis": {"evidence_based_score": 0}
+                    "bias_analysis": {"bias": "Error", "bias_score": 0.0, "bias_percentage": 0, "flagged_phrases": []},
+                    "evidence_analysis": {"evidence_based_score": 0, "flagged_phrases": []}
                 }
             } 

@@ -25,16 +25,21 @@ class BiasAnalyzer:
         try:
             text_lower = text.lower()
             
-            # Count matches
+            flagged_phrases = []
+            
+            # Count matches and collect flagged phrases
             left_count = sum(1 for word in self.left_keywords if word in text_lower)
+            flagged_phrases.extend([word for word in self.left_keywords if word in text_lower])
             right_count = sum(1 for word in self.right_keywords if word in text_lower)
+            flagged_phrases.extend([word for word in self.right_keywords if word in text_lower])
             
             total_words = left_count + right_count
             if total_words == 0:
                 return {
                     "bias": "Neutral",
                     "bias_score": 0.0,  # True neutral
-                    "bias_percentage": 0  # Neutral percentage
+                    "bias_percentage": 0,  # Neutral percentage
+                    "flagged_phrases": []
                 }
             
             # New bias score formula (-1.0 left, 0.0 neutral, 1.0 right)
@@ -63,7 +68,8 @@ class BiasAnalyzer:
             return {
                 "bias": bias,
                 "bias_score": round(bias_score, 2),  # Keep 2 decimal places
-                "bias_percentage": abs(round(bias_percentage, 1))
+                "bias_percentage": abs(round(bias_percentage, 1)),
+                "flagged_phrases": flagged_phrases
             }
             
         except Exception as e:
@@ -71,5 +77,6 @@ class BiasAnalyzer:
             return {
                 "bias": "Error",
                 "bias_score": 0.0,
-                "bias_percentage": 0
+                "bias_percentage": 0,
+                "flagged_phrases": []
             }

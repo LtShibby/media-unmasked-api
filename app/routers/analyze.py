@@ -53,7 +53,6 @@ class AnalysisResponse(BaseModel):
     bias: str
     bias_score: float
     bias_percentage: float
-    flagged_phrases: List[str]
     media_score: MediaScore
 
 @router.post("/analyze", response_model=AnalysisResponse)
@@ -109,14 +108,13 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
             "bias": str(analysis['details']['bias_analysis']['bias']),
             "bias_score": float(analysis['details']['bias_analysis']['bias_score']),
             "bias_percentage": float(analysis['details']['bias_analysis']['bias_percentage']),
-            "flagged_phrases": list(analysis['details']['sentiment_analysis']['flagged_phrases']),
             "media_score": {
                 "media_unmasked_score": float(analysis['media_unmasked_score']),
                 "rating": str(analysis['rating']),
                 "details": {
                     "headline_analysis": {
                         "headline_vs_content_score": float(analysis['details']['headline_analysis']['headline_vs_content_score']),
-                        "contradictory_phrases": analysis['details']['headline_analysis'].get('contradictory_phrases', [])
+                        "flagged_phrases": analysis['details']['headline_analysis'].get('flagged_phrases', [])
                     },
                     "sentiment_analysis": {
                         "sentiment": str(analysis['details']['sentiment_analysis']['sentiment']),
@@ -126,10 +124,12 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
                     "bias_analysis": {
                         "bias": str(analysis['details']['bias_analysis']['bias']),
                         "bias_score": float(analysis['details']['bias_analysis']['bias_score']),
-                        "bias_percentage": float(analysis['details']['bias_analysis']['bias_percentage'])
+                        "bias_percentage": float(analysis['details']['bias_analysis']['bias_percentage']),
+                        "flagged_phrases": list(analysis['details']['bias_analysis']['flagged_phrases'])
                     },
                     "evidence_analysis": {
-                        "evidence_based_score": float(analysis['details']['evidence_analysis']['evidence_based_score'])
+                        "evidence_based_score": float(analysis['details']['evidence_analysis']['evidence_based_score']),
+                        "flagged_phrases": list(analysis['details']['evidence_analysis']['flagged_phrases'])
                     }
                 }
             }
@@ -144,7 +144,6 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
             'bias': response_dict['bias'],
             'bias_score': response_dict['bias_score'],
             'bias_percentage': response_dict['bias_percentage'],
-            'flagged_phrases': response_dict['flagged_phrases'],
             'media_score': response_dict['media_score']
         }).execute()
         
@@ -157,39 +156,3 @@ async def analyze_article(request: ArticleRequest) -> AnalysisResponse:
             status_code=500,
             detail=f"Analysis failed: {str(e)}"
         )
-
-@router.get("/debug")
-async def debug_response():
-    mock_analysis = {
-        "headline": "Test Headline",
-        "content": "Test content",
-        "sentiment": "Neutral",
-        "bias": "Neutral",
-        "bias_score": 0.75,  # Note: 0-1 scale
-        "bias_percentage": 0,
-        "flagged_phrases": ["test phrase"],
-        "media_score": {
-            "media_unmasked_score": 75.5,
-            "rating": "Some Bias Present",
-            "details": {
-                "headline_analysis": {
-                    "headline_vs_content_score": 20,
-                    "contradictory_phrases": ["Sample contradiction"]
-                },
-                "sentiment_analysis": {
-                    "sentiment": "Neutral",
-                    "manipulation_score": 30,
-                    "flagged_phrases": ["Sample manipulative phrase"]
-                },
-                "bias_analysis": {
-                    "bias": "Neutral",
-                    "bias_score": 0.75,
-                    "bias_percentage": 0
-                },
-                "evidence_analysis": {
-                    "evidence_based_score": 80
-                }
-            }
-        }
-    }
-    return AnalysisResponse.parse_obj(mock_analysis)

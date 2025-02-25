@@ -3,6 +3,8 @@ from typing import Dict, Any, List
 from transformers import pipeline
 from transformers import AutoTokenizer
 import numpy as np
+import nltk
+from nltk.tokenize import sent_tokenize
 
 logger = logging.getLogger(__name__)
 
@@ -54,19 +56,35 @@ class HeadlineAnalyzer:
 
     def _analyze_section(self, headline: str, section: str) -> Dict[str, float]:
         """Analyze a single section of content."""
-        input_text = f"{headline} [SEP] {section}"
-        result = self.nli_pipeline(input_text, top_k=None)
-        
-        # Extract scores
-        scores = {item['label']: item['score'] for item in result}
-        
+        # Use a more robust method for sentence splitting
+        nltk.download('punkt')
+        sentences = sent_tokenize(section)
+
+        flagged_phrases = []
+        for sentence in sentences:
+            input_text = f"{headline} [SEP] {sentence}"
+            result = self.nli_pipeline(input_text, top_k=None)
+            scores = {item['label']: item['score'] for item in result}
+            
+            # Log the model output for debugging
+            logger.info(f"Sentence: {sentence}")
+            logger.info(f"Scores: {scores}")
+            
+            # Set the threshold for contradiction to anything higher than 0.1
+            if scores.get('CONTRADICTION', 0) > 0.1:  # Threshold set to > 0.1
+                flagged_phrases.append(sentence)
+                
+        # Adjust the headline_vs_content_score based on contradictions
+        contradiction_penalty = len(flagged_phrases) * 0.1  # Example penalty per contradiction
+        adjusted_score = max(0, scores.get('ENTAILMENT', 0) - contradiction_penalty)
+
         logger.info("\nSection Analysis:")
         logger.info("-"*30)
         logger.info(f"Section preview: {section[:100]}...")
         for label, score in scores.items():
             logger.info(f"Label: {label:<12} Score: {score:.3f}")
             
-        return scores
+        return {"scores": scores, "flagged_phrases": flagged_phrases, "adjusted_score": adjusted_score}
 
     def analyze(self, headline: str, content: str) -> Dict[str, Any]:
         """Analyze how well the headline matches the content using an AI model."""
@@ -146,7 +164,7 @@ class HeadlineAnalyzer:
                 "headline_vs_content_score": round(final_score, 1),
                 "entailment_score": round(entailment_score, 2),
                 "contradiction_score": round(contradiction_score, 2),
-                "contradictory_phrases": []
+                "contradictory_phrases": scores.get('flagged_phrases', [])
             }
             
         except Exception as e:
