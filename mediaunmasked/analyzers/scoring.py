@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Literal
 import logging
 
 from .headline_analyzer import HeadlineAnalyzer
@@ -8,17 +8,34 @@ from .evidence_analyzer import EvidenceAnalyzer
 
 logger = logging.getLogger(__name__)
 
+# Define analysis mode type
+AnalysisMode = Literal['ai', 'traditional']
+
 class MediaScorer:
-    def __init__(self):
-        """Initialize the MediaScorer with required analyzers."""
-        self.headline_analyzer = HeadlineAnalyzer()
-        self.sentiment_analyzer = SentimentAnalyzer()
-        self.bias_analyzer = BiasAnalyzer()
-        self.evidence_analyzer = EvidenceAnalyzer()
+    def __init__(self, use_ai: bool = True):
+        """
+        Initialize the MediaScorer with required analyzers.
+        
+        Args:
+            use_ai: Boolean indicating whether to use AI-powered analysis (True) or traditional analysis (False)
+        """
+        self.use_ai = use_ai
+        self.analysis_mode: AnalysisMode = 'ai' if use_ai else 'traditional'
+        logger.info(f"Initializing MediaScorer with {self.analysis_mode} analysis")
+        
+        # Initialize analyzers with analysis mode preference
+        self.headline_analyzer = HeadlineAnalyzer(use_ai=use_ai)
+        self.sentiment_analyzer = SentimentAnalyzer(use_ai=use_ai)
+        self.bias_analyzer = BiasAnalyzer(use_ai=use_ai)
+        self.evidence_analyzer = EvidenceAnalyzer(use_ai=use_ai)
+        
+        logger.info(f"All analyzers initialized in {self.analysis_mode} mode")
 
     def calculate_media_score(self, headline: str, content: str) -> Dict[str, Any]:
         """Calculate final media credibility score."""
         try:
+            logger.info(f"Calculating media score using {self.analysis_mode} analysis")
+            
             headline_analysis = self.headline_analyzer.analyze(headline, content)
             sentiment_analysis = self.sentiment_analyzer.analyze(content)
             bias_analysis = self.bias_analyzer.analyze(content)
@@ -74,6 +91,7 @@ class MediaScorer:
             result = {
                 "media_unmasked_score": round(final_score, 1),
                 "rating": rating,
+                "analysis_mode": self.analysis_mode,
                 "details": {
                     "headline_analysis": {
                         "headline_vs_content_score": headline_analysis["headline_vs_content_score"],
@@ -107,6 +125,7 @@ class MediaScorer:
             return {
                 "media_unmasked_score": 0,
                 "rating": "Error",
+                "analysis_mode": self.analysis_mode,
                 "details": {
                     "headline_analysis": {"headline_vs_content_score": 0, "flagged_phrases": []},
                     "sentiment_analysis": {"sentiment": "Error", "manipulation_score": 0, "flagged_phrases": []},

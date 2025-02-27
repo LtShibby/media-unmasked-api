@@ -1,7 +1,6 @@
 import logging
 from typing import Dict, Any, List
-from transformers import pipeline
-from transformers import AutoTokenizer
+from transformers import pipeline, AutoTokenizer
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize
@@ -9,12 +8,38 @@ from nltk.tokenize import sent_tokenize
 logger = logging.getLogger(__name__)
 
 class HeadlineAnalyzer:
-    def __init__(self):
-        """Initialize the NLI model for contradiction detection."""
-        self.nli_pipeline = pipeline("text-classification", model="roberta-large-mnli")
-        self.tokenizer = AutoTokenizer.from_pretrained("roberta-large-mnli")
-        self.max_length = 512
+    def __init__(self, use_ai: bool = True):
+        """
+        Initialize the analyzers for headline analysis.
         
+        Args:
+            use_ai: Boolean indicating whether to use AI-powered analysis (True) or traditional analysis (False)
+        """
+        self.use_ai = use_ai
+        self.llm_available = False
+        
+        if use_ai:
+            try:
+                # NLI model for contradiction/entailment
+                self.nli_pipeline = pipeline("text-classification", model="roberta-large-mnli")
+                
+                # Zero-shot classifier for clickbait and sensationalism
+                self.zero_shot = pipeline(
+                    "zero-shot-classification",
+                    model="facebook/bart-large-mnli",
+                    device=-1
+                )
+                
+                self.tokenizer = AutoTokenizer.from_pretrained("roberta-large-mnli")
+                self.max_length = 512
+                self.llm_available = True
+                logger.info("LLM pipelines initialized successfully for headline analysis")
+            except Exception as e:
+                logger.warning(f"Failed to initialize LLM pipelines: {str(e)}")
+                self.llm_available = False
+        else:
+            logger.info("Initializing headline analyzer in traditional mode")
+
     def _split_content(self, headline: str, content: str) -> List[str]:
         """Split content into sections that fit within token limit."""
         content_words = content.split()
@@ -23,7 +48,7 @@ class HeadlineAnalyzer:
         
         # Account for headline and [SEP] token in the max length
         headline_tokens = len(self.tokenizer.encode(headline))
-        sep_tokens = len(self.tokenizer.encode("[SEP]")) - 2  # -2 because encode adds special tokens
+        sep_tokens = len(self.tokenizer.encode("[SEP]")) - 2
         max_content_tokens = self.max_length - headline_tokens - sep_tokens
         
         # Process words into sections
@@ -33,7 +58,6 @@ class HeadlineAnalyzer:
             # Check if current section is approaching token limit
             current_text = " ".join(current_section)
             if len(self.tokenizer.encode(current_text)) >= max_content_tokens:
-                # Remove last word (it might make us go over limit)
                 current_section.pop()
                 sections.append(" ".join(current_section))
                 
@@ -42,141 +66,226 @@ class HeadlineAnalyzer:
                 current_section = current_section[overlap_start:]
                 current_section.append(word)
         
-        # Add any remaining content as the last section
+        # Add any remaining content
         if current_section:
             sections.append(" ".join(current_section))
         
-        logger.info(f"""Content Splitting:
-            - Original content length: {len(content_words)} words
-            - Split into {len(sections)} sections
-            - Headline uses {headline_tokens} tokens
-            - Available tokens per section: {max_content_tokens}
-        """)
         return sections
 
-    def _analyze_section(self, headline: str, section: str) -> Dict[str, float]:
-        """Analyze a single section of content."""
-        # Use a more robust method for sentence splitting
-        nltk.download('punkt')
-        sentences = sent_tokenize(section)
+    def _analyze_section(self, headline: str, section: str) -> Dict[str, Any]:
+        """Analyze a single section for headline accuracy and sensationalism."""
+        try:
+            # Download NLTK data if needed
+            try:
+                nltk.data.find('tokenizers/punkt')
+            except LookupError:
+                nltk.download('punkt')
+            
+            sentences = sent_tokenize(section)
+            
+            # Analyze headline against content for contradiction/entailment
+            nli_scores = []
+            flagged_phrases = []
+            
+            # Categories for sensationalism check
+            sensationalism_categories = [
+                "clickbait",
+                "sensationalized",
+                "misleading",
+                "factual reporting",
+                "accurate headline"
+            ]
+            
+            # Check headline for sensationalism
+            sensationalism_result = self.zero_shot(
+                headline,
+                sensationalism_categories,
+                multi_label=True
+            )
+            
+            sensationalism_scores = {
+                label: score 
+                for label, score in zip(sensationalism_result['labels'], sensationalism_result['scores'])
+            }
+            
+            # Analyze each sentence for contradiction/support
+            for sentence in sentences:
+                if len(sentence.strip()) > 10:
+                    # Check for contradiction/entailment
+                    input_text = f"{headline} [SEP] {sentence}"
+                    nli_result = self.nli_pipeline(input_text, top_k=None)
+                    scores = {item['label']: item['score'] for item in nli_result}
+                    nli_scores.append(scores)
+                    
+                    # Flag contradictory or highly sensationalized content
+                    if scores.get('CONTRADICTION', 0) > 0.4:
+                        flagged_phrases.append({
+                            'text': sentence.strip(),
+                            'type': 'contradiction',
+                            'score': scores['CONTRADICTION']
+                        })
+            
+            # Calculate aggregate scores
+            avg_scores = {
+                label: np.mean([score[label] for score in nli_scores]) 
+                for label in ['ENTAILMENT', 'CONTRADICTION', 'NEUTRAL']
+            }
+            
+            # Calculate headline accuracy score
+            accuracy_components = {
+                'entailment': avg_scores['ENTAILMENT'] * 0.4,
+                'non_contradiction': (1 - avg_scores['CONTRADICTION']) * 0.3,
+                'non_sensational': (
+                    sensationalism_scores.get('factual reporting', 0) +
+                    sensationalism_scores.get('accurate headline', 0)
+                ) * 0.15,
+                'non_clickbait': (
+                    1 - sensationalism_scores.get('clickbait', 0) -
+                    sensationalism_scores.get('sensationalized', 0)
+                ) * 0.15
+            }
+            
+            accuracy_score = sum(accuracy_components.values()) * 100
+            
+            # Sort and limit flagged phrases
+            sorted_phrases = sorted(
+                flagged_phrases,
+                key=lambda x: x['score'],
+                reverse=True
+            )
+            top_phrases = [phrase['text'] for phrase in sorted_phrases[:5]]
+            
+            return {
+                "accuracy_score": accuracy_score,
+                "flagged_phrases": top_phrases,
+                "detailed_scores": {
+                    "nli": avg_scores,
+                    "sensationalism": sensationalism_scores
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Section analysis failed: {str(e)}")
+            return {
+                "accuracy_score": 0,
+                "flagged_phrases": [],
+                "detailed_scores": {}
+            }
 
-        flagged_phrases = []
-        for sentence in sentences:
-            input_text = f"{headline} [SEP] {sentence}"
-            result = self.nli_pipeline(input_text, top_k=None)
-            scores = {item['label']: item['score'] for item in result}
+    def _analyze_traditional(self, headline: str, content: str) -> Dict[str, Any]:
+        """Traditional headline analysis method."""
+        try:
+            # Download NLTK data if needed
+            try:
+                nltk.data.find('tokenizers/punkt')
+            except LookupError:
+                nltk.download('punkt')
+
+            # Basic metrics
+            headline_words = set(headline.lower().split())
+            content_words = set(content.lower().split())
             
-            # Log the model output for debugging
-            logger.info(f"Sentence: {sentence}")
-            logger.info(f"Scores: {scores}")
+            # Calculate word overlap
+            overlap_words = headline_words.intersection(content_words)
+            overlap_score = len(overlap_words) / len(headline_words) if headline_words else 0
             
-            # Set the threshold for contradiction to anything higher than 0.1
-            if scores.get('CONTRADICTION', 0) > 0.1:  # Threshold set to > 0.1
-                flagged_phrases.append(sentence)
+            # Check for clickbait patterns
+            clickbait_patterns = [
+                "you won't believe",
+                "shocking",
+                "mind blowing",
+                "amazing",
+                "incredible",
+                "unbelievable",
+                "must see",
+                "click here",
+                "find out",
+                "what happens next"
+            ]
+            
+            clickbait_count = sum(1 for pattern in clickbait_patterns if pattern in headline.lower())
+            clickbait_penalty = clickbait_count * 10  # 10% penalty per clickbait phrase
+            
+            # Calculate final score (0-100)
+            base_score = overlap_score * 100
+            final_score = max(0, min(100, base_score - clickbait_penalty))
+            
+            # Find potentially misleading phrases
+            flagged_phrases = []
+            sentences = sent_tokenize(content)
+            
+            for sentence in sentences:
+                # Flag sentences that directly contradict headline words
+                sentence_words = set(sentence.lower().split())
+                if len(headline_words.intersection(sentence_words)) > 2:
+                    flagged_phrases.append(sentence.strip())
                 
-        # Adjust the headline_vs_content_score based on contradictions
-        contradiction_penalty = len(flagged_phrases) * 0.1  # Example penalty per contradiction
-        adjusted_score = max(0, scores.get('ENTAILMENT', 0) - contradiction_penalty)
-
-        logger.info("\nSection Analysis:")
-        logger.info("-"*30)
-        logger.info(f"Section preview: {section[:100]}...")
-        for label, score in scores.items():
-            logger.info(f"Label: {label:<12} Score: {score:.3f}")
+                # Flag sentences with clickbait patterns
+                if any(pattern in sentence.lower() for pattern in clickbait_patterns):
+                    flagged_phrases.append(sentence.strip())
             
-        return {"scores": scores, "flagged_phrases": flagged_phrases, "adjusted_score": adjusted_score}
+            return {
+                "headline_vs_content_score": round(final_score, 1),
+                "flagged_phrases": list(set(flagged_phrases))[:5]  # Limit to top 5 unique phrases
+            }
+            
+        except Exception as e:
+            logger.error(f"Traditional analysis failed: {str(e)}")
+            return {
+                "headline_vs_content_score": 0,
+                "flagged_phrases": []
+            }
 
     def analyze(self, headline: str, content: str) -> Dict[str, Any]:
-        """Analyze how well the headline matches the content using an AI model."""
+        """Analyze how well the headline matches the content."""
         try:
             logger.info("\n" + "="*50)
             logger.info("HEADLINE ANALYSIS STARTED")
             logger.info("="*50)
             
-            # Handle empty inputs
             if not headline.strip() or not content.strip():
                 logger.warning("Empty headline or content provided")
                 return {
                     "headline_vs_content_score": 0,
-                    "entailment_score": 0,
-                    "contradiction_score": 0,
-                    "contradictory_phrases": []
+                    "flagged_phrases": []
                 }
 
-            # Split content if too long
-            content_tokens = len(self.tokenizer.encode(content))
-            if content_tokens > self.max_length:
-                logger.warning(f"""
-                    Content Length Warning:
-                    - Total tokens: {content_tokens}
-                    - Max allowed: {self.max_length}
-                    - Splitting into sections...
-                """)
+            # Use LLM analysis if available and enabled
+            if self.use_ai and self.llm_available:
+                logger.info("Using LLM analysis for headline")
+                # Split content if needed
                 sections = self._split_content(headline, content)
+                section_results = []
                 
                 # Analyze each section
-                section_scores = []
-                for i, section in enumerate(sections, 1):
-                    logger.info(f"\nAnalyzing section {i}/{len(sections)}")
-                    scores = self._analyze_section(headline, section)
-                    section_scores.append(scores)
+                for section in sections:
+                    result = self._analyze_section(headline, section)
+                    section_results.append(result)
                 
-                # Aggregate scores across sections
-                # Use max contradiction (if any section strongly contradicts, that's important)
-                # Use mean entailment (overall support across sections)
-                # Use mean neutral (general neutral tone across sections)
-                entailment_score = np.mean([s.get('ENTAILMENT', 0) for s in section_scores])
-                contradiction_score = np.max([s.get('CONTRADICTION', 0) for s in section_scores])
-                neutral_score = np.mean([s.get('NEUTRAL', 0) for s in section_scores])
+                # Aggregate results across sections
+                accuracy_scores = [r['accuracy_score'] for r in section_results]
+                final_score = np.mean(accuracy_scores)
                 
-                logger.info("\nAggregated Scores Across Sections:")
-                logger.info("-"*30)
-                logger.info(f"Mean Entailment: {entailment_score:.3f}")
-                logger.info(f"Max Contradiction: {contradiction_score:.3f}")
-                logger.info(f"Mean Neutral: {neutral_score:.3f}")
+                # Combine flagged phrases from all sections
+                all_phrases = []
+                for result in section_results:
+                    all_phrases.extend(result['flagged_phrases'])
+                
+                # Remove duplicates and limit to top 5
+                unique_phrases = list(dict.fromkeys(all_phrases))[:5]
+                
+                return {
+                    "headline_vs_content_score": round(final_score, 1),
+                    "flagged_phrases": unique_phrases
+                }
             else:
-                # Single section analysis
-                scores = self._analyze_section(headline, content)
-                entailment_score = scores.get('ENTAILMENT', 0)
-                contradiction_score = scores.get('CONTRADICTION', 0)
-                neutral_score = scores.get('NEUTRAL', 0)
-            
-            # Compute final consistency score
-            final_score = (
-                (entailment_score * 0.6) +      # Base score from entailment
-                (neutral_score * 0.3) +         # Neutral is acceptable
-                ((1 - contradiction_score) * 0.1)  # Small penalty for contradiction
-            ) * 100
-            
-            # Log final results
-            logger.info("\nFinal Analysis Results:")
-            logger.info("-"*30)
-            logger.info(f"Headline: {headline}")
-            logger.info(f"Content Length: {content_tokens} tokens")
-            logger.info("\nFinal Scores:")
-            logger.info(f"{'Entailment:':<15} {entailment_score:.3f}")
-            logger.info(f"{'Neutral:':<15} {neutral_score:.3f}")
-            logger.info(f"{'Contradiction:':<15} {contradiction_score:.3f}")
-            logger.info(f"\nFinal Score: {final_score:.1f}%")
-            logger.info("="*50 + "\n")
-            
-            return {
-                "headline_vs_content_score": round(final_score, 1),
-                "entailment_score": round(entailment_score, 2),
-                "contradiction_score": round(contradiction_score, 2),
-                "contradictory_phrases": scores.get('flagged_phrases', [])
-            }
+                # Use traditional analysis
+                logger.info("Using traditional headline analysis")
+                return self._analyze_traditional(headline, content)
             
         except Exception as e:
-            logger.error("\nHEADLINE ANALYSIS ERROR")
-            logger.error("-"*30)
-            logger.error(f"Error Type: {type(e).__name__}")
-            logger.error(f"Error Message: {str(e)}")
-            logger.error("Stack Trace:", exc_info=True)
-            logger.error("="*50 + "\n")
+            logger.error(f"Headline analysis failed: {str(e)}")
             return {
                 "headline_vs_content_score": 0,
-                "entailment_score": 0,
-                "contradiction_score": 0,
-                "contradictory_phrases": []
+                "flagged_phrases": []
             } 
