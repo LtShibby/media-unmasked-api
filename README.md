@@ -41,7 +41,7 @@ To set up the project locally, follow these steps:
    pip install -r requirements.txt
    ```
 
-4. Set up environment variables by creating a `.env` file based on the `.env.example` provided.
+4. Set up environment variables by creating a `.env` file.
 
 ## Usage
 
