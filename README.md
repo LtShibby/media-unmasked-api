@@ -1,3 +1,8 @@
+Here’s your updated `README.md`, now with a **step-by-step Supabase table setup guide** for local testing. This version keeps the tone clean and practical while making sure your contributors don’t end up breaking production or getting lost.
+
+---
+
+```markdown
 ---
 title: Media Unmasked API
 emoji: 👀
@@ -45,33 +50,82 @@ To set up the project locally, follow these steps:
 
 ## Usage
 
-To run the application, use the following command:
-
+To run the application locally:
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 7860 --reload
 ```
 
-Once the server is running, you can access the API at `http://localhost:7860`.
+Access the API at: `http://localhost:7860`
 
 ## Configuration
 
-The application can be configured using environment variables. Key variables include:
+The application is configured using environment variables. Be sure to include the following in your `.env` file:
 
-- `SUPABASE_URL`: The URL for the Supabase database.
-- `SUPABASE_KEY`: The API key for accessing Supabase.
+- `SUPABASE_URL`: Your Supabase project URL
+- `SUPABASE_KEY`: Your Supabase anon or service role key
+
+---
+
+## 🔧 Supabase Setup Guide (for Local Testing)
+
+To store analysis results in your Supabase database, create the required table like so:
+
+### 1. Go to [Supabase](https://app.supabase.com/)
+
+- Log in or create an account
+- Create a new project
+- Open your project and go to the **SQL Editor**
+
+### 2. Paste and run the following SQL script to create the table:
+
+```sql
+CREATE TABLE public.article_analysis (
+  id SERIAL PRIMARY KEY,
+  url TEXT NOT NULL,
+  headline TEXT NOT NULL,
+  content TEXT NOT NULL,
+  sentiment TEXT NOT NULL,
+  bias TEXT NOT NULL,
+  bias_score DOUBLE PRECISION NOT NULL,
+  bias_percentage DOUBLE PRECISION NOT NULL,
+  media_score JSONB NOT NULL,
+  requester_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  analysis_mode TEXT NOT NULL
+);
+```
+
+### 3. Get Your Supabase URL and Key
+
+- Go to **Project Settings** → **API**
+- Copy the `Project URL` and `anon/public API key`
+- Paste them into your `.env` file like so:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-anon-key
+```
+
+> ⚠️ For testing, the anon key is fine. For production or team testing, use a **service role key** with caution.
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
+We love contributors. If you're interested in building AI scoring models, improving performance, or UX tweaks—jump in.
+
+1. Fork the repo
+2. Make changes on a branch
+3. Submit a pull request with clear notes
 
 ## License
 
-This project is licensed under the Apache-2.0 License.
+Apache-2.0
 
 ## Contact
 
-For any questions or inquiries, please [contact the maintainers](https://wozwize.com/contact).
+[Reach out here](https://wozwize.com/contact) with questions or interest in deeper collaboration.
 
 ## About
 
-MediaUnmasked is a product of [Wozwize](https://wozwize.com), dedicated to providing insightful analysis of media content.
+MediaUnmasked is a project by [Wozwize](https://wozwize.com), dedicated to building transparent, powerful AI tooling to detect and expose media bias.
